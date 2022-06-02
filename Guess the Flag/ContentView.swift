@@ -13,6 +13,8 @@ struct ContentView: View {
     @State var isAlertVisible = false
     @State var message: String = ""
     @State var score: Int = 0
+    @State var round: Int = 0
+    @State var gameIsOver = false
     var body: some View {
         ZStack {
             RadialGradient(stops: [.init(color: .init(red: 0.1, green: 0.2, blue: 0.45), location: 0.3), .init(color: .init(red: 0.76, green: 0.15, blue: 0.26), location: 0.3)], center: .top, startRadius: 200, endRadius: 700)
@@ -58,6 +60,9 @@ struct ContentView: View {
                 Text("Score: \(score)")
                     .font(.title.bold())
                     .foregroundColor(.white)
+                Text("Round: \(round)")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
                 Spacer()
             }
             .padding()
@@ -65,25 +70,42 @@ struct ContentView: View {
         .alert(message, isPresented: $isAlertVisible) {
             Button("Cancel", role: .cancel) {}
             Button("OK") {
-                restrat()
+                restart()
             }
         } message: {
             Text("Your Score is: \(score)")
         }
+        .alert(message, isPresented: $gameIsOver) {
+            Button("Yes") {
+                round = 0
+                score = 0
+                restart()
+            }
+        } message: {
+            Text("Your Score: \(score). Do you want to restart?")
+        }
+
     }
     
     func score(number: Int) {
         if number == randomNumber {
-            message = "Congratulations, you guessed right"
+            message = "Correct"
             score += 30
         } else {
-            message = "Unfortunately you didn't guess"
+            message = "Wrong! That’s the flag of \(countries[number])"
             score -= 30
         }
-        isAlertVisible.toggle()
+        round += 1
+        if round == 8 {
+            gameIsOver.toggle()
+        }
+        
+        if !gameIsOver {
+            isAlertVisible.toggle()
+        }
     }
     
-    func restrat() {
+    func restart() {
         countries.shuffle()
         randomNumber = Int.random(in: 0...2)
     }
