@@ -15,28 +15,52 @@ struct ContentView: View {
     @State var score: Int = 0
     var body: some View {
         ZStack {
-            LinearGradient(gradient: .init(colors: [.blue, .black]), startPoint: .top, endPoint: .bottom)
+            RadialGradient(stops: [.init(color: .init(red: 0.1, green: 0.2, blue: 0.45), location: 0.3), .init(color: .init(red: 0.76, green: 0.15, blue: 0.26), location: 0.3)], center: .top, startRadius: 200, endRadius: 700)
                 .ignoresSafeArea()
-            VStack(spacing: 30) {
-                VStack {
-                    Text("Choose the flag of:")
-                        .font(.subheadline.weight(.heavy))
-                    Text("\(countries[randomNumber])")
-                        .font(.largeTitle.weight(.semibold))
-                }
-                .foregroundColor(.white)
+            
+            VStack {
+                Spacer()
                 
-                ForEach(0..<3) { number in
-                    Button {
-                        score(number: number)
-                    } label: {
-                        Image("\(countries[number])")
-                            .renderingMode(.original)
-                            .cornerRadius(15)
-                            .shadow(radius: 5)
+                Text("Guess the Flag")
+                    .foregroundColor(.white)
+                    .font(.largeTitle.bold())
+                
+                Spacer()
+                
+                VStack(spacing: 15) {
+                    VStack {
+                        Text("Choose the flag of:")
+                            .font(.subheadline.weight(.heavy))
+                            .foregroundStyle(.secondary)
+                        Text("\(countries[randomNumber])")
+                            .font(.largeTitle.weight(.semibold))
+                    }
+                    
+                    ForEach(0..<3) { number in
+                        Button {
+                            score(number: number)
+                        } label: {
+                            Image("\(countries[number])")
+                                .renderingMode(.original)
+                                .cornerRadius(15)
+                                .shadow(radius: 5)
+                        }
                     }
                 }
+                .frame(maxWidth: .infinity)
+                .padding(10)
+                .background(.thinMaterial)
+                .cornerRadius(15)
+                
+                Spacer()
+                Spacer()
+                
+                Text("Score: \(score)")
+                    .font(.title.bold())
+                    .foregroundColor(.white)
+                Spacer()
             }
+            .padding()
         }
         .alert(message, isPresented: $isAlertVisible) {
             Button("Cancel", role: .cancel) {}
