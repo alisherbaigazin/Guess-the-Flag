@@ -15,6 +15,15 @@ struct ContentView: View {
     @State var score: Int = 0
     @State var round: Int = 0
     @State var gameIsOver = false
+    
+    @State var selected = -1
+    
+    @State var rotate = 0
+    
+    @State var isCorrect = false
+    @State var fade = false
+    @State var isWrong = false
+    
     var body: some View {
         ZStack {
             RadialGradient(stops: [.init(color: .init(red: 0.1, green: 0.2, blue: 0.45), location: 0.3), .init(color: .init(red: 0.76, green: 0.15, blue: 0.26), location: 0.3)], center: .top, startRadius: 200, endRadius: 700)
@@ -39,14 +48,23 @@ struct ContentView: View {
                     }
                     
                     ForEach(0..<3) { number in
+                        
+//                        FlagButton(image: countries[number], number: number, score: score)
                         Button {
-                            score(number: number)
+                            withAnimation {
+                                score(number)
+                                rotate += 360
+                            }
+
                         } label: {
                             Image("\(countries[number])")
                                 .renderingMode(.original)
                                 .cornerRadius(15)
                                 .shadow(radius: 5)
                         }
+                        .rotation3DEffect(.degrees(isCorrect && number == selected ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                        .opacity(fade && selected != number ? 0.25 : 1)
+                        .rotation3DEffect(.degrees(isWrong && number == selected ? 360 : 0), axis: (x: 0, y: 0, z: 0.5))
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -87,13 +105,18 @@ struct ContentView: View {
 
     }
     
-    func score(number: Int) {
+    func score(_ number: Int) {
+        selected = number
         if number == randomNumber {
             message = "Correct"
             score += 30
+            isCorrect = true
+            fade = true
         } else {
             message = "Wrong! That’s the flag of \(countries[number])"
             score -= 30
+            fade = true
+            isWrong = true
         }
         round += 1
         if round == 8 {
@@ -108,6 +131,9 @@ struct ContentView: View {
     func restart() {
         countries.shuffle()
         randomNumber = Int.random(in: 0...2)
+        isCorrect = false
+        fade = false
+        isWrong = false
     }
 }
 
